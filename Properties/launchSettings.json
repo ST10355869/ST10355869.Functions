@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ST10355869.Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7247",
+      "launchBrowser": false
+    }
+  }
+}
