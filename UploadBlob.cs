@@ -15,7 +15,7 @@ public class UploadBlob
 
     [Function("UploadBlob")]
     public async Task<HttpResponseData> Run(
-    [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+    [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req)
     {
         _logger.LogInformation("C# HTTP trigger function processed a request.");
 
