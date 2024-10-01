@@ -16,7 +16,6 @@ public static class ProcessQueueMessage
         string queueName = req.Query["queueName"];
         string message = req.Query["message"];
 
-
         var queueServiceClient = new QueueServiceClient(connectionString);
         var queueClient = queueServiceClient.GetQueueClient(queueName);
         await queueClient.CreateIfNotExistsAsync();
