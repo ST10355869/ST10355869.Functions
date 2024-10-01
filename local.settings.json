@@ -3,6 +3,13 @@
   "Values": {
     "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=cldvstoragesem2;AccountKey=QA62NgBmuYXSzYONe7oHMz+Nc0jV/QtubasPMw4xP4+9GCMLMzbyBiRgvRDmHdU/k0NQ3LsR6xxe+ASt3XGKGQ==;EndpointSuffix=core.windows.net",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "AzureStorage:ConnectionString": "DefaultEndpointsProtocol=https;AccountName=cldvstoragesem2;AccountKey=QA62NgBmuYXSzYONe7oHMz+Nc0jV/QtubasPMw4xP4+9GCMLMzbyBiRgvRDmHdU/k0NQ3LsR6xxe+ASt3XGKGQ==;EndpointSuffix=core.windows.net"
+    "AzureStorage:ConnectionString": "DefaultEndpointsProtocol=https;AccountName=cldvstoragesem2;AccountKey=QA62NgBmuYXSzYONe7oHMz+Nc0jV/QtubasPMw4xP4+9GCMLMzbyBiRgvRDmHdU/k0NQ3LsR6xxe+ASt3XGKGQ==;EndpointSuffix=core.windows.net",
+    "AzureFunctions": {
+      "StoreOrderProcessURL": "https://st10355869functionapp.azurewebsites.net/api/ProcessQueueMessage?code=NfbkaT80baUsvaoR3BmjV-gMtOyoyZcN6qOr_mGY0fakAzFuuBka3Q==",
+      "UploadFileURL": "https://st10355869functionapp.azurewebsites.net/api/UploadFile?code=6FqN2Ucd9XV8Jhw2hKn88yih1-pTmYDQC59NUlTMOTobAzFu8NNqTA==",
+      "BlobStorage": "https://st10355869functionapp.azurewebsites.net/api/UploadBlob?code=LKu5GXrUtntOaeHb9UVyxwq-U2kqClPKvcoJo9L41uNyAzFuHkrBWQ==",
+      "TableStorage": "https://st10355869functionapp.azurewebsites.net/api/StoreTableInfo?code=2akDhwZDgSFxifVPS3Cm7Ll-G33-qJ3NvAQPDgOb1duoAzFuU_XR9g=="
+
+    }
   }
 }

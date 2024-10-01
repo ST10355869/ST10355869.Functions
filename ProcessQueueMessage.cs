@@ -9,18 +9,32 @@ public static class ProcessQueueMessage
 {
     [Function("ProcessQueueMessage")]
     public static async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-        ILogger log)
+     [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+     ILogger log)
     {
-        var connectionString = Environment.GetEnvironmentVariable("AzureStorage:ConnectionString");
+        log.LogInformation("C# HTTP trigger function processed a request.");
+
         string queueName = req.Query["queueName"];
         string message = req.Query["message"];
 
-        var queueServiceClient = new QueueServiceClient(connectionString);
-        var queueClient = queueServiceClient.GetQueueClient(queueName);
-        await queueClient.CreateIfNotExistsAsync();
-        await queueClient.SendMessageAsync(message);
+        if (string.IsNullOrEmpty(queueName) || string.IsNullOrEmpty(message))
+        {
+            return new BadRequestObjectResult("Please pass a queueName and message on the query string");
+        }
 
-        return new OkObjectResult("Message added to queue");
+        try
+        {
+            var connectionString = Environment.GetEnvironmentVariable("AzureStorage:ConnectionString");
+            var queueClient = new QueueClient(connectionString, queueName);
+            await queueClient.CreateIfNotExistsAsync();
+            await queueClient.SendMessageAsync(message);
+
+            return new OkObjectResult($"Message '{message}' sent to queue '{queueName}'");
+        }
+        catch (Exception ex)
+        {
+            log.LogError($"Error: {ex.Message}");
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
     }
 }
