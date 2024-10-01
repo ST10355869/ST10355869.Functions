@@ -1,35 +1,55 @@
 using Azure.Storage.Blobs;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using System.IO;
-using System.Threading.Tasks;
+using System.Net;
 
-public static class UploadBlob
+public class UploadBlob
+{
+    private readonly ILogger _logger;
+
+    public UploadBlob(ILoggerFactory loggerFactory)
     {
-        [Function("UploadBlob")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-            ILogger log)
+        _logger = loggerFactory.CreateLogger<UploadBlob>();
+    }
+
+    [Function("UploadBlob")]
+    public async Task<HttpResponseData> Run(
+    [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+    {
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+
+        string containerName = req.Query["containerName"];
+        string blobName = req.Query["blobName"];
+
+        if (string.IsNullOrEmpty(containerName) || string.IsNullOrEmpty(blobName))
         {
-            string containerName = req.Query["containerName"];
-            string blobName = req.Query["blobName"];
+            var badRequestResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            await badRequestResponse.WriteStringAsync("Container name and blob name must be provided.");
+            return badRequestResponse;
+        }
 
-            if (string.IsNullOrEmpty(containerName) || string.IsNullOrEmpty(blobName))
-            {
-                return new BadRequestObjectResult("Container name and blob name must be provided.");
-            }
-
+        try
+        {
             var connectionString = Environment.GetEnvironmentVariable("AzureStorage:ConnectionString");
             var blobServiceClient = new BlobServiceClient(connectionString);
             var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
             await containerClient.CreateIfNotExistsAsync();
             var blobClient = containerClient.GetBlobClient(blobName);
 
-            using var stream = req.Body;
-            await blobClient.UploadAsync(stream, true);
+            await using var stream = req.Body;
+            await blobClient.UploadAsync(stream, overwrite: true);
 
-            return new OkObjectResult("Blob uploaded");
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            await response.WriteStringAsync($"Blob uploaded successfully. URL: {blobClient.Uri}");
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading blob");
+            var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+            await errorResponse.WriteStringAsync("An error occurred while uploading the blob.");
+            return errorResponse;
         }
     }
+}
